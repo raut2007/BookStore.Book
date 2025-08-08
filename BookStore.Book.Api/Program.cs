@@ -3,8 +3,18 @@ using BookStore.Book.Api.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173") // React Vite dev server
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
+// Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -15,6 +25,9 @@ builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
 var app = builder.Build();
+
+// Use CORS
+app.UseCors("AllowFrontend");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
